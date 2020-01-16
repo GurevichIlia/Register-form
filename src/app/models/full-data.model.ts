@@ -1,0 +1,82 @@
+export interface FullData {
+      LandingWebPages: LandingWebPages[];
+      LandingWebPagesFileds: LandingWebPagesFileds[];
+
+}
+export interface LandingWebPagesFileds {
+      GroupHeader: string;
+      FieldValue: string;
+      Groupid: number;
+      Groupname: string;
+      LandingWebPagesFieldsId: number;
+      Type: number;
+      groupnofields: number;
+      id: number;
+      required: number;
+      sort: number;
+      toshow: number;
+}
+export interface LandingWebPages {
+      CheckAfterSunset: number;
+      CheckAfterSunsetrequired: number;
+      CheckBirthDay: number;
+      CheckBirthDayrequired: number;
+      CSSUrl: string;
+      CheckCity: number;
+      CheckCityrequired: number;
+      CheckCompany: number;
+      CheckCompanyrequired: number;
+      CheckRemark: number;
+      CheckRemarkrequired: number;
+      Checkcellphone: number;
+      Checkcellphonerequired: number;
+      Checkcountry: number;
+      Checkcountryrequired: number;
+      Checkemail: number;
+      Checkemailrequired: number;
+      Checkfirstname: number;
+      Checkfirstnamerequired: number;
+      Checklastname: number;
+      Checklastnamerequired: number;
+      Checkphone: number;
+      Checkphonerequired: number;
+      Checkstate: number;
+      Checkstaterequired: number;
+      Checkstreet: number;
+      Checkstreetrequired: number;
+      Checktz: number;
+      Checktzrequired: number;
+      Checkzip: number;
+      Checkziprequired: number;
+      CreateTokenJValidateType: number;
+      CustomerServiceId: number;
+      CustomerType: number;
+      EmailNotifyTo: string;
+      EmailNotifyToBcc: string;
+      ErrorRedirectUrl: string;
+      GUID: string;
+      GroupId: number;
+      IsIframe: string;
+      NotifyEmailSubject: string;
+      OrgGuid: string;
+      OrgName: string;
+      PageType: number;
+      PostToUrl: string;
+      ReturnErrorIfTzNotExist: number;
+      RowDate: string;
+      SkeepEmailCheck: number;
+      SkeepPhoneCheck: number;
+      SuccessRedirectUrl: string;
+      TokenPageLanguage: string;
+      deleted: number;
+      employeeId: number;
+      id: number;
+      lang: number;
+      localHtmlFilePath: string;
+      must_have_validTz: number;
+      must_have_validTz_msg: string;
+      name: string;
+      orgid: number;
+      ThanksMsg: string;
+      urlPage: string;
+}
