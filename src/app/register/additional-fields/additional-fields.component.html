@@ -1,0 +1,42 @@
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <div [formGroup]="checksForm">
+
+        <div formArrayName="checks">
+          <div *ngFor="let control of checks; let i = index">
+            <div [formGroupName]="i">
+              <!-- {{control.validator}} -->
+              <mat-form-field class="w-100">
+                <mat-label>{{(getLabel(control) | replace : {searchValue: '_', replaceValue: ' '})}}
+                </mat-label>
+                <textarea autocomplete="off" maxlength="2000" matInput [required]="isRequired(control)"
+                  [placeholder]="getLabel(control) | replace : {searchValue: '_', replaceValue: ' '}"
+                  [formControlName]="getControlName(control)"></textarea>
+                <mat-error>{{'Field should not be empty' | translate}}</mat-error>
+
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+        <!-- [required]="isRequired(control.controls['N' + (i+1).toString()])" -->
+
+
+        <!-- <div formArrayName="checksRequired">
+    <div *ngFor="let control of checksForm.controls.checksRequired['controls']['controls']; let i = index">
+      <div [formGroupName]="i">
+        <mat-form-field class="w-100">
+          <mat-label>{{'Check N' + (i+1)}}</mat-label>
+          <input matInput placeholder="{{'Check N' + (i+1)}}" [formControlName]="'CheckN' + (i+1)+ 'required'" required>
+        </mat-form-field>
+      </div>
+    </div>
+  </div> -->
+
+
+        <!-- <button (click)="showInfo()">sumbit</button> -->
+
+      </div>
+    </div>
+  </div>
+</div>

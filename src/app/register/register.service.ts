@@ -1,12 +1,15 @@
+import { AdditionalFields } from './../models/additional-fields';
+import { GeneralService } from './../general.service';
 import { Cities } from './../models/cities.model';
 import { LandingWebPagesFileds, FullData, LandingWebPages } from './../models/full-data.model';
 import { Injectable } from '@angular/core';
-import { FormArray, FormBuilder, Validators, AbstractControl } from '@angular/forms';
+import { FormArray, FormBuilder, Validators, AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { FinalDataFromRegisterForm } from '../models/data-from-register-form.model';
 import * as moment from 'moment';
 import { MainInfo } from '../models/mainInfo.model';
-import { startWith, map } from 'rxjs/operators';
-
+import { startWith, map, tap } from 'rxjs/operators';
+import { removeEmojis } from '../core/global-functions/global-functions';
+import { MyValidators } from './../core/classes/validators';
 @Injectable({
   providedIn: 'root'
 })
@@ -14,12 +17,14 @@ export class RegisterService {
   customerInfo = {};
   checkboxInputsName: LandingWebPagesFileds[];
   mainInfoInputsName: string[] = [];
-  allMainInfoInputsName = ['Checkfirstname', 'Checklastname', 'Checkemail', 'Checkstreet', 'Checkstreet2', 'Checkzip', 'Checkstate', 'Checkcountry', 'Checktz', 'Checkcellphone', 'Checkphone'];
+  allMainInfoInputsName = ['Checkfirstname', 'Checklastname', 'Checkemail', 'Checkstreet', 'Checkstreet2', 'CheckCity', 'Checkzip', 'Checkstate', 'Checkcountry', 'Checktz', 'Checkcellphone', 'Checkphone'];
   fullDataForPage: FullData;
   finalDataFromRegisterForm: FinalDataFromRegisterForm;
   constructor(
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private generalService: GeneralService
   ) { }
+
 
   addInput(inputName: LandingWebPagesFileds | string, inputArray: FormArray) {
     if (typeof (inputName) === 'string') {
@@ -60,19 +65,24 @@ export class RegisterService {
     if (requiredField === 1) {
       if (inputName === 'Checkemail') {
         return [Validators.required, Validators.email];
+      } else if (inputName === 'Checktz') {
+        return [Validators.required, MyValidators.validateTZ];
       } else {
         return Validators.required;
+
       }
 
     } else if (inputName === 'Checkfirstname' || inputName === 'Checklastname') {
       return Validators.required;
+    } else if (inputName === 'Checktz') {
+      return MyValidators.validateTZ;
     }
     //  else if (inputName === 'Checkemail') {
     //   return [Validators.required, Validators.email];
     // }
   }
   setCheckboxInputsValue(array: LandingWebPagesFileds[]) {
-    return this.checkboxInputsName = array.filter(field => field.Type === 2);
+    return this.checkboxInputsName = array.filter(field => field.Type === '2');
   }
 
   checkIfNeedShowField(arrayWithDataForChecking: LandingWebPages[], inputName: string) {
@@ -100,7 +110,10 @@ export class RegisterService {
     this.fullDataForPage = data;
   }
 
-  setDataFromRegisterForm(tz: string, firstname: string, lastname: string,
+  setDataFromRegisterForm(
+    tz: string,
+    firstname: string,
+    lastname: string,
     afterSunset: boolean,
     street: string,
     street2: string,
@@ -113,17 +126,18 @@ export class RegisterService {
     birthdate: string,
     remark: string,
     email: string,
-    groups: { groupId: number }[]) {
-    this.finalDataFromRegisterForm = {
+    groups: { groupId: number }[],
+  ) {
+    const finalDataFromRegisterForm = {
       tz,
       firstname,
       lastname,
       afterSunset,
       street,
       street2,
-      city,
       state,
       country,
+      city,
       zip,
       cellphone,
       phone,
@@ -133,8 +147,25 @@ export class RegisterService {
       email,
 
     };
-
+    this.finalDataFromRegisterForm = this.removeEmojiesFromObject(finalDataFromRegisterForm);
   }
+
+  removeEmojiesFromObject(obj) {
+    const newObj = { ...obj };
+
+    if (!obj) return;
+
+    for (const key in newObj) {
+
+      if (typeof newObj[key] === 'string') {
+
+        newObj[key] = removeEmojis(newObj[key]);
+      }
+    }
+
+    return newObj;
+  }
+
   checkIfArrayAlreadyExist(arrayForChecking: LandingWebPagesFileds[][], newArray: LandingWebPagesFileds[]) {
     let exist: boolean;
     for (const field of arrayForChecking) {
@@ -220,5 +251,59 @@ export class RegisterService {
     return filteredSubject.filter((title: Cities) => title[filterKey].toLowerCase().includes(filterValue));
   }
 
-  
+
+  createChecksAndChecksRequiredArray(pages: LandingWebPages, checkControls: FormArray) {
+    // const checks: FormGroup = this.fb.group({});
+    // const checksRequired: FormGroup = this.fb.group({});
+
+    // const checksForm = this.fb.group({
+    //   checks: this.fb.array([]),
+    //   // checksRequired: this.fb.array([])
+    // });
+
+    // const checks = checksForm.get('checks') as FormArray;
+    // const checksRequired = checksForm.get('checksRequired') as FormArray;
+    const SHOW_FIELD = 1;
+    const FIELD_REQUIRED = 1;
+    for (let i = 1; i <= 20; i++) {
+      if (pages[`CheckN${i}`] === SHOW_FIELD) {
+
+        if (pages[`CheckN${i}required`] === FIELD_REQUIRED) {
+          checkControls.push(this.fb.group({
+            [`N${i}`]: ['', Validators.required]
+          }));
+        } else {
+          checkControls.push(this.fb.group({
+            [`N${i}`]: ['']
+          }));
+        }
+
+      }
+
+
+      // checksRequired.push(this.fb.group({
+      //   [`N${i}required`]: ['', Validators.required]
+      // }))
+
+    }
+
+    return {
+      // checks,
+      // checksRequired
+    }
+
+  }
+
+  getAdditionalFieldsFromForm(fields: AdditionalFields[], fullDataForSendToServer: {}) {
+    const additionalFields = {};
+    const pat = /\n/g;
+    fields.map(field => {
+      const keys = Object.keys(field);
+      fullDataForSendToServer[keys[0]] = removeEmojis(field[keys[0]]).replace(pat, '\r\n');
+
+    });
+
+    // console.log(fullDataForSendToServer);
+    return additionalFields;
+  }
 }

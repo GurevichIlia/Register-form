@@ -5,7 +5,7 @@ import { AppRoutingModule } from './app-routing.module';
 
 import { AppComponent } from './app.component';
 import { MaterialModule } from './material.module';
-import { NgxMaskModule, IConfig } from 'ngx-mask';
+import { NgxMaskModule } from 'ngx-mask';
 
 import { RegisterComponent } from './register/register.component';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
@@ -20,6 +20,8 @@ import { MAT_DATE_LOCALE } from '@angular/material';
 import { HtmlPipe } from './shared/pipes/html.pipe';
 import { ToastrModule } from 'ngx-toastr';
 import { SuccessComponent } from './shared/modals/success/success.component';
+import { AdditionalFieldsComponent } from './register/additional-fields/additional-fields.component';
+import { ReplacePipe } from './shared/pipes/replace.pipe';
 
 
 export function createTranslateLoader(http: HttpClient) {
@@ -35,7 +37,9 @@ export function createTranslateLoader(http: HttpClient) {
     CheckboxesComponent,
     OptionsComponent,
     HtmlPipe,
-    SuccessComponent
+    SuccessComponent,
+    AdditionalFieldsComponent,
+    ReplacePipe
 
   ],
   imports: [

@@ -1,4 +1,4 @@
-<form [formGroup]="registerForm" style="text-align: justify">
+<form [formGroup]="registerForm" style="text-align: justify" *ngIf="registerForm">
       <div formArrayName="options" *ngFor="let options of _optionsArray; let i=index" class="list-unstyled ml-2 mr-2">
             <h4 class="mb-3">{{options[0].GroupHeader}}</h4>
             <mat-radio-group #OptionGroup [formControlName]="i" aria-labelledby="example-radio-group-label">
@@ -8,8 +8,7 @@
 
                   </div>
             </mat-radio-group>
-            <mat-hint *ngIf="registerForm.controls.options.controls[i].invalid" style="color: green">{{'Please select one
-                  option' | translate}}</mat-hint>
+            <mat-hint *ngIf="registerForm.controls.options.controls[i].invalid" style="color: green">{{'Please select one option' | translate}}</mat-hint>
             <hr>
       </div>
 </form>

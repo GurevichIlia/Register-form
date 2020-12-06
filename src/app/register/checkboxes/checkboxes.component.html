@@ -1,9 +1,9 @@
-<form [formGroup]="registerForm" [style.fontSize]="'20px'">
+<form [formGroup]="registerForm" [style.fontSize]="'20px'" *ngIf="registerForm">
       <div style="text-align: justify" formArrayName="checkboxes" class="col-sm-12 col-md-12 col-lg-12 col-xl-12 ">
             <h4 class="mb-3">{{checkboxArray[0]?.GroupHeader}}</h4>
             <span *ngFor="let checkbox of _checkboxesArray; let i=index">
                   <div [formGroupName]="i">
-                        <mat-checkbox formControlName="checkbox" [value]="checkbox.GroupId" class="example-margin ">
+                        <mat-checkbox formControlName="checkbox" [value]="checkbox.Groupid" class="example-margin ">
                         </mat-checkbox>
                         <span>{{checkbox.FieldValue}}</span>
 

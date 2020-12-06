@@ -11,7 +11,7 @@
       "Login": "Login",
       "SystemLogin": "System login",
 
-     
+
 
 
 
@@ -69,7 +69,7 @@
 
 
 
-      
+
 
       "Receipt type": "Receipt type",
       "Organisation": "Select organisation",
@@ -142,7 +142,7 @@
       "Please select a thanks letter": "Please select a thanks letter",
       "Amount less than the amount in the store": "Amount less than the amount in the store",
 
-      
+
 
      "Customer id": "Customer id",
      "Receipt number": "Receipt number",
@@ -152,8 +152,8 @@
      "From number / Company name(English)": "From number / Company name(English)",
      "Message": "Message",
 
-    
-      
+
+
 
      "firstname": "First name",
      "lastname": "Last name ",
@@ -168,12 +168,13 @@
      "state": "State",
      "area": "Area",
      "country": "Country",
-     "remark": "Remark",
+     "Remark": "Remark",
      "registration": "Registration",
      "required": "Required",
      "Please select one option" :"Please select one option",
      "dateFormatError": "Format is not correct. Should be DD/MM/YYYY",
-     
-     "closeRegistration": "The registration is close"
-   
+
+     "closeRegistration": "The registration is close",
+     "Field should not be empty": "Field should not be empty"
+
   }

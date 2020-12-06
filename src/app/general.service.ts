@@ -6,6 +6,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Cities } from './models/cities.model';
+import { Title } from '@angular/platform-browser';
 
 interface ResponseAfterSave {
   customerid: string;
@@ -22,9 +23,11 @@ export class GeneralService {
   baseUrl = 'https://jaffawebapisandbox.amax.co.il/Api/LandingPage/';
   constructor(
     private translateService: TranslateService,
-    private http: HttpClient
+    private http: HttpClient,
+    private titleService: Title,
   ) {
   }
+
   switchLanguage(language: string) {
     this.translateService.use(language);
     this.setLanguage(language);
@@ -61,4 +64,7 @@ export class GeneralService {
     return this.http.get(`${this.baseUrl}GetHtmlPage_ForReg?urlAddr=${guid}`);
   }
 
+  setPageTitle(title: string) {
+    this.titleService.setTitle(title);
+  }
 }

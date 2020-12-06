@@ -1,21 +1,19 @@
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { MatDialog, MatDialogRef } from '@angular/material';
+import { TranslateService } from '@ngx-translate/core';
+import { ToastrService } from 'ngx-toastr';
+import { Observable, Subject } from 'rxjs';
+import { delay, takeUntil } from 'rxjs/operators';
+import { AdditionalFields } from '../models/additional-fields';
+import { MainInfo } from '../models/mainInfo.model';
+import { SuccessComponent } from '../shared/modals/success/success.component';
+import { GeneralService } from './../general.service';
 import { Cities } from './../models/cities.model';
 import { FinalDataFromRegisterForm } from './../models/data-from-register-form.model';
-import { MainInfoComponent } from './main-info/main-info.component';
 import { FullData, LandingWebPagesFileds } from './../models/full-data.model';
-import { GeneralService } from './../general.service';
-import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
-import { FormBuilder, FormGroup, FormArray, Validators, FormControl, AbstractControl } from '@angular/forms';
+import { MainInfoComponent } from './main-info/main-info.component';
 import { RegisterService } from './register.service';
-import { Observable, Subject } from 'rxjs';
-import { TranslateService } from '@ngx-translate/core';
-import * as moment from 'moment';
-import { MainInfo } from '../models/mainInfo.model';
-import { takeUntil, map, distinctUntilChanged, debounceTime, distinctUntilKeyChanged, tap } from 'rxjs/operators';
-import { ToastrService } from 'ngx-toastr';
-import { MatDialog, MatDialogRef } from '@angular/material';
-import { SuccessComponent } from '../shared/modals/success/success.component';
-import { ActivatedRoute } from '@angular/router';
-import * as _ from 'lodash';
 
 @Component({
   selector: 'app-register',
@@ -38,6 +36,9 @@ export class RegisterComponent implements OnInit, OnDestroy {
   filteredCities$: Observable<Cities[]>;
   modal$: MatDialogRef<SuccessComponent>;
   pathGuid;
+  additionalFieldsName: AdditionalFields;
+  checkAndCheckRequired$: Observable<FormGroup>;
+
   constructor(
     private fb: FormBuilder,
     private registerService: RegisterService,
@@ -45,7 +46,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
     private translate: TranslateService,
     private toastr: ToastrService,
     private matDialog: MatDialog,
-    private activatedRoute: ActivatedRoute
+
   ) {
     this.getPageGuid();
   }
@@ -56,6 +57,18 @@ export class RegisterComponent implements OnInit, OnDestroy {
     this.createRegistrationForm();
     this.getCitiesFromServer();
     this.getFullDataFromServer();
+
+
+
+
+    // this.checkAndCheckRequired$ = this.generalService.getFullData(this.pathGuid)
+    //   .pipe(
+    //     filter(data => data !== null && data !== undefined),
+    //     pluck('LandingWebPages', 0),
+    //     map(webPages => this.registerService.createChecksAndChecksRequiredArray(webPages)),
+    //     tap(res => console.log('FORM CONTROLS', res))
+    //   );
+
     // this.options.valueChanges.subscribe(data => console.log(data));
     // this.checkboxes.valueChanges.subscribe(data => console.log(data));
     // this.registerForm.valueChanges
@@ -76,7 +89,9 @@ export class RegisterComponent implements OnInit, OnDestroy {
       afterSunset: [false],
       checkboxes: this.fb.array([]),
       options: this.fb.array([]),
-      city: ['']
+      checks: this.fb.array([]),
+      // checksRequired: this.fb.array([]),
+      // city: ['']
     });
   }
   get checkboxes() {
@@ -98,7 +113,13 @@ export class RegisterComponent implements OnInit, OnDestroy {
     return this.registerForm.get('remark');
   }
   get city() {
-    return this.registerForm.get('city');
+    const cityControl = this.maininfoInputs.controls.find((control: FormGroup) => {
+      return Boolean(control.controls['City'])
+    }) as FormGroup;
+
+    if (cityControl) {
+      return cityControl.controls['City'];
+    }
   }
   get afterSunset() {
     return this.registerForm.get('afterSunset');
@@ -121,6 +142,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
   addInputsToMainInfoArray() {
     this.registerService.addInputsToInputsArray(this.registerService.getAllmainInfoInputsName(), this.maininfoInputs);
     this.getMainInfoInputsName();
+
+    // console.log('MAIN INFO INPUTS', this.maininfoInputs)
   }
 
   addInputsToCheckBoxArray() {
@@ -129,27 +152,36 @@ export class RegisterComponent implements OnInit, OnDestroy {
   }
 
   getDataFromRegisterForm() {
+    if (this.registerForm.invalid) {
+      return;
+    }
     const mainInfo: MainInfo = this.getDataFromMainInfoForm(this.maininfoInputs.value);
     // const birthdate = this.birthday.value ? moment(this.birthday.value, 'MM/DD/YYYY').format('DD-MM-YYYY') : '';
     const birthdate = this.getBirthdayDate();
     const remark = this.remark.value;
     const groups = this.concatOptionsAndCheckboxes([...this.checkboxes.value], [...this.options.value]);
 
-
     this.registerService.setDataFromRegisterForm(
-      mainInfo.tz, mainInfo.firstname, mainInfo.lastname, this.afterSunset.value,
-      mainInfo.street, mainInfo.street2, this.city.value, mainInfo.state, mainInfo.country,
-      mainInfo.zip, mainInfo.cellphone, mainInfo.phone, birthdate, remark, mainInfo.email, groups
+      mainInfo.tz,
+      mainInfo.firstname,
+      mainInfo.lastname,
+      this.afterSunset.value,
+      mainInfo.street,
+      mainInfo.street2,
+      mainInfo.City,
+      mainInfo.state, mainInfo.country,
+      mainInfo.zip, mainInfo.cellphone, mainInfo.phone, birthdate, remark, mainInfo.email, groups,
+
     );
+
+    this.registerService.getAdditionalFieldsFromForm(this.registerForm.get('checks').value, this.registerService.getFinalCustomerData());
+
     this.saveCustomerData(this.registerService.getFinalCustomerData());
     // console.log('REGISTER FORM VALUE', this.registerForm.value);
   }
 
   getCurrentLanguage() {
-    this.translate.onLangChange
-      .pipe(
-        takeUntil(this.subscription$))
-      .subscribe(language => console.log(language));
+    ;
     this.language$ = this.generalService.getLanguage$();
   }
 
@@ -172,7 +204,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
         takeUntil(this.subscription$))
       .subscribe((data: FullData) => {
         if (data) {
-          console.log(data, 'Full DATA');
+          // console.log(data, 'Full DATA');
           if (data.LandingWebPages.length !== 0) {
             this.fullDataForPage = data;
             this.registerService.setFullData(data);
@@ -183,6 +215,16 @@ export class RegisterComponent implements OnInit, OnDestroy {
             this.addInputsToCheckBoxArray();
             this.getHtmlPage();
             this.setBirthdayIsRequired(data);
+
+            const additionalFieldsControls = this.registerForm.get('checks') as FormArray;
+
+            this.registerService.createChecksAndChecksRequiredArray(data.LandingWebPages[0], additionalFieldsControls);
+            this.generalService.setPageTitle(data.LandingWebPages[0].PageTitle);
+            // this.registerForm.get('checksRequired')['controls'] = checks.checksRequired;
+            this.additionalFieldsName = data.AditionalFileds[0];
+
+            // this.registerForm.get('checksRequired').patchValue(checks.checksRequired)
+
           } else {
             console.log('Empty Full Data', data);
           }
@@ -212,7 +254,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
       month = month < 10 ? `0${this.birthday.get('month').value}` : this.birthday.get('month').value;
       year = year;
       const birthday = `${day}/${month}/${year}`;
-      console.log(birthday);
+      // console.log(birthday);
       return birthday;
     }
 
@@ -267,14 +309,14 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   getFilteredCheckBoxesArray(fullData: LandingWebPagesFileds[]) {
     return this.checkboxesArray = fullData
-      .filter(field => field.Type === 2).sort((a, b) => {
+      .filter(field => field.Type === '2').sort((a, b) => {
         return (a.sort > b.sort) ? 1 : (a.sort < b.sort) ? -1 : 0;
       });
   }
 
   getFilteredOptionsArray(fullData: LandingWebPagesFileds[]) {
     return this.filteredByTypeOptions = fullData
-      .filter(field => field.Type === 1).sort((a, b) => {
+      .filter(field => field.Type === '1').sort((a, b) => {
         return (a.sort > b.sort) ? 1 : (a.sort < b.sort) ? -1 : 0;
       });
   }
@@ -302,7 +344,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
   }
 
   saveCustomerData(customerData: FinalDataFromRegisterForm) {
-    // console.log('FINAL DATA STRING', JSON.stringify(customerData));
+
+    // console.log('FINAL DATA STRING', customerData);
     this.generalService.saveCustomerInfo(customerData, this.getOrgName(), this.getGuid())
       .pipe(
         takeUntil(this.subscription$))
@@ -313,12 +356,14 @@ export class RegisterComponent implements OnInit, OnDestroy {
             // tslint:disable-next-line: max-line-length
             const modal = this.matDialog.open(SuccessComponent, { width: '400px', height: '200px', disableClose: true, data: { thanksMessage: this.getThanksMessage() } });
             this.redirectToUrl(modal);
-            this.resetMainInfoForm();
+            setTimeout(() => {
+              this.resetMainInfoForm();
+            }, 1)
 
             this.toastr.success('נשמר בהצלחה');
-            console.log(data);
+            // console.log(data);
           } else {
-            console.log(data);
+            // console.log(data);
             this.toastr.warning('Something went wrong!', data.moreinfo);
           }
         }
@@ -362,10 +407,9 @@ export class RegisterComponent implements OnInit, OnDestroy {
   resetMainInfoForm() {
     this.registerForm.get('mainInfo').reset();
     this.birthday.reset();
-    this.city.reset();
     this.checkboxes.controls.forEach((data: FormGroup) => data.patchValue({ checkbox: false }));
     this.options.controls.forEach((data: FormControl) => data.patchValue(''));
-    console.log(this.registerForm);
+    // console.log(this.registerForm);
   }
 
   redirectToUrl(modal: MatDialogRef<SuccessComponent>) {
@@ -373,16 +417,20 @@ export class RegisterComponent implements OnInit, OnDestroy {
       .pipe(
         takeUntil(this.subscription$))
       .subscribe(() => {
-        const resp = window.location.assign(this.getSuccessRedirectLink());
-        console.log(resp);
+        const link = this.getSuccessRedirectLink();
+        if (link) {
+          window.location.assign(link);
+        } else {
+          window.location.assign(window.location.href);
+        }
       });
   }
 
   getPageGuid() {
     const path = window.location.pathname.split('/');
     this.pathGuid = path[path.length - 1];
-    console.log('FULL PATH', path);
-    console.log('PATH ARRAY', this.pathGuid);
+    // console.log('FULL PATH', path);
+    // console.log('PATH ARRAY', this.pathGuid);
   }
 
   cityAutocomplete(filteredSubject: Cities[], titleInput: AbstractControl, filterKey: string) {
@@ -390,8 +438,11 @@ export class RegisterComponent implements OnInit, OnDestroy {
   }
 
   filterCity(filteredSubject: Cities[]) {
+    if (!this.city) return
     this.filteredCities$ = this.cityAutocomplete(filteredSubject, this.city, 'CityName');
   }
+
+
 
 
   ngOnDestroy(): void {

@@ -19,10 +19,19 @@ export class MainInfoComponent implements OnInit {
   years = _.range(new Date().getFullYear() + 1, 1900);
   monthes = new Array(12);
   days = new Array(31);
+  newForm = new FormGroup({
+
+  });
+
+
   constructor() { }
 
   ngOnInit() {
+    // this.registerForm.valueChanges.subscribe(e => console.log(this.mainInfo))
+    // console.log(this.registerForm.controls.mainInfo['controls']);
+
   }
+
   get showCity() {
     if (this.fullDataForPage) {
       return this.fullDataForPage.LandingWebPages[0].CheckCity;
@@ -67,4 +76,29 @@ export class MainInfoComponent implements OnInit {
     }
   }
 
+
+  setName(inputName: string) {
+    let name = '';
+    switch (inputName) {
+      case 'lastname':
+        name = 'lastname';
+        break;
+      case 'firstname':
+        name = 'firstname';
+        break;
+      case 'email':
+        name = 'email';
+        break;
+      case 'phone' || 'cellphone':
+        name = 'phone';
+        break;
+      case 'address':
+        name = 'address';
+        break;
+      default:
+        break;
+    }
+
+    return name;
+  }
 }

@@ -15,6 +15,7 @@ export class OptionsComponent implements OnInit {
 
   @Input() set optionsArray(optionsArray: LandingWebPagesFileds[][]) {
     this._optionsArray = optionsArray;
+    // console.log(this.registerForm)
   }
   constructor() { }
 
