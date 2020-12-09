@@ -1,12 +1,14 @@
+import { environment } from './../environments/environment';
 import { FinalDataFromRegisterForm } from './models/data-from-register-form.model';
 import { FullData } from './models/full-data.model';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
 import { Cities } from './models/cities.model';
 import { Title } from '@angular/platform-browser';
+import { ActivatedRoute } from '@angular/router';
 
 interface ResponseAfterSave {
   customerid: string;
@@ -14,18 +16,23 @@ interface ResponseAfterSave {
   moreinfo: string;
 }
 
+export type IWindowMode = 'iframe' | 'regular'
+
 @Injectable({
   providedIn: 'root'
 })
 export class GeneralService {
   language = new BehaviorSubject<string>('he');
   language$ = this.language.asObservable();
-  baseUrl = 'https://jaffawebapisandbox.amax.co.il/Api/LandingPage/';
+  baseUrl = environment.baseUrl;
+  private readonly _windowMode$ = new BehaviorSubject<IWindowMode>('regular')
   constructor(
     private translateService: TranslateService,
     private http: HttpClient,
     private titleService: Title,
+    private route: ActivatedRoute
   ) {
+
   }
 
   switchLanguage(language: string) {
@@ -66,5 +73,21 @@ export class GeneralService {
 
   setPageTitle(title: string) {
     this.titleService.setTitle(title);
+  }
+
+  setWindowMode(mode: IWindowMode) {
+    this._windowMode$.next(mode);
+  }
+
+  get windowMode$(): Observable<IWindowMode> {
+    return this.route.queryParamMap.pipe(
+      switchMap(queryParams => {
+        if (queryParams.has('mode') && queryParams.get('mode') === 'iframe') {
+          this.setWindowMode('iframe')
+        }
+
+        return this._windowMode$.asObservable()
+      })
+    )
   }
 }

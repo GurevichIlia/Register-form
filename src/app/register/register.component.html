@@ -1,45 +1,6 @@
-<!-- <div class="container">
-      <div class="row">
-            <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12" [innerHtml]="htmlPage?.Data | htmlPipe"></div>
 
-      </div>
-</div>
-<div class="container mb-5 mt-5" *ngIf="!fullDataForPage">
-      <div class="row justify-content-center">
-            <mat-card class="col-sm-12 col-md-12 col-lg-7 col-xl-7">
-                  <h4 class="ml-3">{{'registration' | translate}}</h4>
-                  <h5 class="ml-5">No data</h5>
-            </mat-card>
-      </div>
-</div>
-<div class="container mb-5 mt-5" *ngIf="fullDataForPage">
-      <div class="row justify-content-center ">
-            <mat-card class="col-sm-12 col-md-12 col-lg-7 col-xl-7">
-                  <div class="text-inline row " style="direction: initial; justify-content: space-between">
-                        <h4 class="ml-3">{{'registration' | translate}}</h4>
-                        <button [style.fontSize]="'16px'" mat-button *ngIf="(language$ | async) === 'he'"
-                              (click)="changeLanguage('en')">en</button>
-                        <button [style.fontSize]="'16px'" mat-button *ngIf="(language$ | async) === 'en'"
-                              (click)="changeLanguage('he')">he</button>
-                  </div>
-                  <app-main-info [fullDataForPage]="fullDataForPage" [cities]="filteredCities$ | async"
-                        [mainInfoInputsName]="mainInfoInputsName" [registerForm]="registerForm">
-                  </app-main-info>
-                  <hr *ngIf="checkboxesArray.length !== 0">
-                  <app-checkboxes [checkboxesArray]="checkboxesArray" [registerForm]="registerForm">
-                  </app-checkboxes>
-                  <hr *ngIf="optionsArray.length !== 0">
-                  <app-options [optionsArray]="optionsArray" [registerForm]="registerForm"></app-options>
-
-                  <button class="col-sm-12 col-md-12 col-lg-6 col-xl-6" [disabled]="registerForm.invalid"
-                        (click)="getDataFromRegisterForm()" color="primary" mat-raised-button
-                        type="button">{{'Submit' | translate }}</button>
-
-            </mat-card>
-      </div>
-</div> -->
 <div class="container">
-  <div class="row">
+  <div class="row" *ngIf="(windowMode$ | async) === 'regular'">
     <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12" [innerHtml]="htmlPage?.Data | htmlPipe"></div>
 
   </div>
@@ -84,7 +45,7 @@
         (click)="getDataFromRegisterForm()" color="primary" mat-raised-button
         type="button">{{'Submit' | translate }}</button>
       <br>
-      <small class="mt-2">v1.0</small>
+      <small class="mt-2">v1.1</small>
     </mat-card>
   </div>
 </div>

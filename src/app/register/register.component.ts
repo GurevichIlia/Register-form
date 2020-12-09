@@ -8,7 +8,7 @@ import { delay, takeUntil } from 'rxjs/operators';
 import { AdditionalFields } from '../models/additional-fields';
 import { MainInfo } from '../models/mainInfo.model';
 import { SuccessComponent } from '../shared/modals/success/success.component';
-import { GeneralService } from './../general.service';
+import { GeneralService, IWindowMode } from './../general.service';
 import { Cities } from './../models/cities.model';
 import { FinalDataFromRegisterForm } from './../models/data-from-register-form.model';
 import { FullData, LandingWebPagesFileds } from './../models/full-data.model';
@@ -38,7 +38,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   pathGuid;
   additionalFieldsName: AdditionalFields;
   checkAndCheckRequired$: Observable<FormGroup>;
-
+  windowMode$: Observable<IWindowMode>
   constructor(
     private fb: FormBuilder,
     private registerService: RegisterService,
@@ -57,7 +57,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
     this.createRegistrationForm();
     this.getCitiesFromServer();
     this.getFullDataFromServer();
-
+    this.windowMode$ = this.generalService.windowMode$
 
 
 
