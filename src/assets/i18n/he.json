@@ -166,7 +166,8 @@
       "dateFormatError": "התאריך אינו במבנה המתאים",
 
       "closeRegistration": "ההרשמה נסגרה",
-      "Field should not be empty": "שדה זה אינו יכול להיות ריק"
+      "Field should not be empty": "שדה זה אינו יכול להיות ריק",
+       "Page is not active":"דף זה אינו פעיל"
 
 
 

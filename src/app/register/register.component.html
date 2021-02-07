@@ -13,11 +13,16 @@
     </mat-card>
   </div>
 </div>
-<div class="container mb-5 mt-5" *ngIf="fullDataForPage">
-  <div class="row justify-content-center ">
+<div class="container mb-5 mt-5" *ngIf="fullDataForPage" >
+  <div class="row justify-content-center " #registrationContent>
     <mat-card class="col-sm-12 col-md-12 col-lg-7 col-xl-7">
+      <h1 *ngIf="isDeletedPage" class="text-center not-active-message">{{'Page is not active' | translate}}</h1>
+      <div
+        class="text-inline row "
+        style="direction: initial; justify-content: space-between"
+        *ngIf="(windowMode$ | async) !== 'iframe' "
 
-      <div class="text-inline row " style="direction: initial; justify-content: space-between">
+      >
         <!-- <h4 class="ml-3">{{'registration' | translate}}</h4> -->
         <span class="lang-toggle" [style.fontSize]="'16px'"  *ngIf="(language$ | async) === 'he'"
           (click)="changeLanguage('en')">en</span>
@@ -41,7 +46,7 @@
       </app-checkboxes>
 
 
-      <button class="col-sm-12 col-md-12 col-lg-6 col-xl-6 mt-5" [disabled]="registerForm.invalid"
+      <button class="col-sm-12 col-md-12 col-lg-6 col-xl-6 mt-5" [disabled]="!registerForm.valid && isDeletedPage"
         (click)="getDataFromRegisterForm()" color="primary" mat-raised-button
         type="button">{{'Submit' | translate }}</button>
       <br>

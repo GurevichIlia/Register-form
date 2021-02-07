@@ -175,6 +175,7 @@
      "dateFormatError": "Format is not correct. Should be DD/MM/YYYY",
 
      "closeRegistration": "The registration is close",
-     "Field should not be empty": "Field should not be empty"
+     "Field should not be empty": "Field should not be empty",
+     "Page is not active":"Page is not active"
 
   }

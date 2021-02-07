@@ -44,7 +44,7 @@ export class GeneralService {
       document.body.setAttribute('dir', 'ltr');
     }
   }
-  setLanguage(language: string) {
+  private setLanguage(language: string) {
     this.language.next(language);
   }
   getLanguage$() {
@@ -83,6 +83,15 @@ export class GeneralService {
     return this.route.queryParamMap.pipe(
       switchMap(queryParams => {
         if (queryParams.has('mode') && queryParams.get('mode') === 'iframe') {
+          debugger
+          const language: 'Hebrew' | 'English' = queryParams.get('option') as 'Hebrew' | 'English'
+
+          if (language && language === 'English') {
+            this.switchLanguage('en')
+          } else {
+            this.switchLanguage('he')
+
+          }
           this.setWindowMode('iframe')
         }
 

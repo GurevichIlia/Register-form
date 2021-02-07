@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material';
 import { TranslateService } from '@ngx-translate/core';
@@ -20,8 +20,9 @@ import { RegisterService } from './register.service';
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss']
 })
-export class RegisterComponent implements OnInit, OnDestroy {
+export class RegisterComponent implements OnInit, OnDestroy, AfterViewChecked {
   @ViewChild(MainInfoComponent, { static: true }) mainInfoComponent: MainInfoComponent;
+  @ViewChild('registrationContent', { static: false }) mainContentBlock: ElementRef<HTMLDivElement>
   registerForm: FormGroup;
   language$: Observable<string>;
   checkboxInputsName: LandingWebPagesFileds[];
@@ -59,24 +60,16 @@ export class RegisterComponent implements OnInit, OnDestroy {
     this.getFullDataFromServer();
     this.windowMode$ = this.generalService.windowMode$
 
-
-
-    // this.checkAndCheckRequired$ = this.generalService.getFullData(this.pathGuid)
-    //   .pipe(
-    //     filter(data => data !== null && data !== undefined),
-    //     pluck('LandingWebPages', 0),
-    //     map(webPages => this.registerService.createChecksAndChecksRequiredArray(webPages)),
-    //     tap(res => console.log('FORM CONTROLS', res))
-    //   );
-
-    // this.options.valueChanges.subscribe(data => console.log(data));
-    // this.checkboxes.valueChanges.subscribe(data => console.log(data));
-    // this.registerForm.valueChanges
-    //   .pipe(
-    //     takeUntil(this.subscription$))
-    //   .subscribe(data => console.log(data));
-
   }
+
+  ngAfterViewChecked() {
+    // console.log('MAIN DIV', this.mainContentBlock ? this.mainContentBlock.nativeElement.clientHeight : this.mainContentBlock)
+
+    if (this.mainContentBlock) {
+      this.registerService.sendContentHeightToTopWindow(this.mainContentBlock.nativeElement.clientHeight)
+    }
+  }
+
   createRegistrationForm() {
     this.registerForm = this.fb.group({
       mainInfo: this.fb.array([]),
@@ -222,6 +215,10 @@ export class RegisterComponent implements OnInit, OnDestroy {
             this.generalService.setPageTitle(data.LandingWebPages[0].PageTitle);
             // this.registerForm.get('checksRequired')['controls'] = checks.checksRequired;
             this.additionalFieldsName = data.AditionalFileds[0];
+
+            if (data.LandingWebPages[0].deleted === 1) {
+              this.registerForm.disable();
+            }
 
             // this.registerForm.get('checksRequired').patchValue(checks.checksRequired)
 
@@ -442,6 +439,11 @@ export class RegisterComponent implements OnInit, OnDestroy {
     this.filteredCities$ = this.cityAutocomplete(filteredSubject, this.city, 'CityName');
   }
 
+  get isDeletedPage(): boolean {
+    if (this.fullDataForPage) {
+      return this.fullDataForPage.LandingWebPages[0].deleted === 1;
+    }
+  }
 
 
 

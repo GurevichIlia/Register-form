@@ -1,3 +1,4 @@
+import { IframeConnectorService } from './../core/services/iframe-connector.service';
 import { AdditionalFields } from './../models/additional-fields';
 import { GeneralService } from './../general.service';
 import { Cities } from './../models/cities.model';
@@ -22,7 +23,8 @@ export class RegisterService {
   finalDataFromRegisterForm: FinalDataFromRegisterForm;
   constructor(
     private fb: FormBuilder,
-    private generalService: GeneralService
+    private generalService: GeneralService,
+    private iframeConnectorService: IframeConnectorService
   ) { }
 
 
@@ -305,5 +307,9 @@ export class RegisterService {
 
     // console.log(fullDataForSendToServer);
     return additionalFields;
+  }
+
+  sendContentHeightToTopWindow(contentHeight: number): void {
+    this.iframeConnectorService.sendMessage(window.top, { contentHeight })
   }
 }
